@@ -1,0 +1,32 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Al conectar este repo a Render (Dashboard -> New + -> Blueprint), Render
+# leerá este archivo y creará el Web Service automáticamente.
+#
+# Para desplegar manualmente sin Blueprint, basta con crear un Web Service
+# Node y replicar los valores de buildCommand/startCommand/envVars.
+
+services:
+  - type: web
+    name: primer-round-landing
+    runtime: node
+    plan: free            # cámbialo a starter si querés evitar cold-starts
+    region: oregon        # alternativas: virginia, frankfurt, singapore
+    branch: main          # ajustá al nombre real de la rama por defecto
+
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+
+    healthCheckPath: /
+    autoDeploy: true      # cada push a la rama dispara un nuevo deploy
+
+    envVars:
+      - key: NODE_VERSION
+        value: 20.14.0
+      - key: NODE_ENV
+        value: production
+      # URL pública del sitio (se usa en metadataBase para Open Graph / SEO).
+      # Tras el primer deploy, copiá la URL real que asigna Render
+      # (https://primer-round-landing.onrender.com) y pegala aquí.
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false       # se configura desde el dashboard, no se guarda en el repo

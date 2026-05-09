@@ -1,0 +1,387 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Estos valores son defaults; el `<html>` los sobrescribe a partir de siteConfig. */
+  --color-primary: #f97316;
+  --color-primary-contrast: #ffffff;
+  --color-secondary: #171717;
+  --color-secondary-contrast: #ffffff;
+  --color-soft: #fef4ec;
+  --color-surface: #ffffff;
+  --color-ink: #171717;
+  --color-muted: #6b6b6b;
+  --color-border: #ece5dc;
+}
+
+html {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* Foco accesible global. Tailwind ya cubre la mayoría, esto es un baseline extra. */
+:focus-visible {
+  outline: none;
+}
+
+/* Selección de texto con color del branding. */
+::selection {
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+/* Reduce motion para usuarios sensibles. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          Intro animation (welcome)                         */
+/* -------------------------------------------------------------------------- */
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #1a1a1a 0%, #000 70%);
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.6s ease-in;
+}
+
+.intro-overlay--fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-skip {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.55rem 1.1rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.intro-skip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.intro-skip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+@media (min-width: 768px) {
+  .intro-skip {
+    right: 1.5rem;
+    top: 1.5rem;
+  }
+}
+
+.intro-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* `lighten`: el fondo negro de la foto desaparece y solo se ve el ring + spotlight. */
+  mix-blend-mode: lighten;
+  animation: intro-ring-in 1.4s 0.05s ease-out forwards;
+  pointer-events: none;
+}
+
+.intro-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.intro-glove {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.intro-glove-img {
+  /* Tamaño con variable para poder usarla en los offsets de los keyframes. */
+  width: var(--glove-w, clamp(220px, 38vmin, 440px));
+  height: auto;
+  display: block;
+  /* PNG con canal alpha: no necesita mix-blend-mode. */
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 28px rgba(249, 115, 22, 0.2));
+}
+
+.intro-glove {
+  --glove-w: clamp(220px, 38vmin, 440px);
+  /*
+   * Offsets relativos al ancho del guante (medido sobre el PNG real:
+   * bounding box del guante = [8.3 % .. 92.1 %], el borde extremo
+   * está a 0.421·w del centro del sprite). Así la colisión es solo
+   * de bordes (no se superponen los cuerpos), independientemente del
+   * tamaño calculado del guante:
+   *   - impact: bordes se tocan en el centro de pantalla (0.42·w).
+   *   - pre:    justo antes del impacto, ~30 px de separación (0.50·w).
+   *   - post:   rebote, claramente separados (0.62·w).
+   */
+  --glove-impact: calc(var(--glove-w) * 0.42);
+  --glove-pre: calc(var(--glove-w) * 0.5);
+  --glove-post: calc(var(--glove-w) * 0.62);
+}
+
+.intro-glove--left {
+  /* Duración definida en IntroAnimation (--intro-duration) para sincronizar con los timers JS */
+  animation: intro-glove-left var(--intro-duration, 24s) linear forwards;
+}
+
+.intro-glove--right {
+  animation: intro-glove-right var(--intro-duration, 24s) linear forwards;
+}
+
+/* Espejamos el guante derecho para que mire al izquierdo (knuckles al centro). */
+.intro-glove--right .intro-glove-img {
+  transform: scaleX(-1);
+}
+
+.intro-flash {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  /* Delay y duración del flash alineados con JS (--intro-flash-delay / --intro-flash-duration) */
+  animation: intro-flash var(--intro-flash-duration, 1.2s) var(--intro-flash-delay, 13.15s)
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  filter: drop-shadow(0 0 35px rgba(249, 115, 22, 0.7));
+}
+
+.intro-flash-svg {
+  width: clamp(180px, 30vmin, 320px);
+  height: auto;
+}
+
+@keyframes intro-ring-in {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 0.78;
+    transform: scale(1);
+  }
+}
+
+/*
+ * Coreografía guante izquierdo — duración total var(--intro-duration).
+ *
+ *   0 – 8 %    entrada desde fuera (fade-in)
+ *   8 – 38 %   acercamiento al centro
+ *   38 – 44 %  anticipación
+ *   44 %       IMPACTO (los bordes / nudillos apenas se tocan)
+ *   44 – 50 %  rebote elástico
+ *   50 – 88 %  alejamiento progresivo
+ *   88 – 100 % salida y fade final
+ *
+ * Las distancias cerca del centro usan calc() con --glove-impact (≈44 % del
+ * ancho del guante) para que los nudillos se toquen en el centro SIN que
+ * los cuerpos se solapen, sea cual sea el tamaño del guante.
+ */
+@keyframes intro-glove-left {
+  0% {
+    transform: translate(-105vw, 0) rotate(-12deg);
+    opacity: 0;
+  }
+  4% {
+    transform: translate(-78vw, 0) rotate(-10deg);
+    opacity: 1;
+  }
+  10% {
+    transform: translate(-58vw, 0) rotate(-8deg);
+    opacity: 1;
+  }
+  18% {
+    transform: translate(-40vw, 0) rotate(-6deg);
+    opacity: 1;
+  }
+  26% {
+    transform: translate(-25vw, 0) rotate(-4deg);
+    opacity: 1;
+  }
+  34% {
+    transform: translate(calc(var(--glove-pre) * -1.7), 0) rotate(-3deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(calc(var(--glove-pre) * -1.05), 0) rotate(-2deg);
+    opacity: 1;
+  }
+  /* Anticipación (justo antes del impacto) */
+  42% {
+    transform: translate(calc(var(--glove-pre) * -1), 0) rotate(-2deg);
+    opacity: 1;
+  }
+  /* IMPACTO: los nudillos se tocan en el centro */
+  44% {
+    transform: translate(calc(var(--glove-impact) * -1), 0) rotate(2deg) scale(1.06);
+    opacity: 1;
+  }
+  /* Rebote */
+  48% {
+    transform: translate(calc(var(--glove-post) * -1), 0) rotate(-3deg) scale(1);
+    opacity: 1;
+  }
+  54% {
+    transform: translate(calc(var(--glove-w) * -0.85), 0) rotate(-5deg);
+    opacity: 1;
+  }
+  62% {
+    transform: translate(-22vw, 2px) rotate(-7deg);
+    opacity: 1;
+  }
+  72% {
+    transform: translate(-35vw, 4px) rotate(-10deg);
+    opacity: 1;
+  }
+  82% {
+    transform: translate(-52vw, 6px) rotate(-14deg);
+    opacity: 1;
+  }
+  92% {
+    transform: translate(-78vw, 10px) rotate(-22deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-115vw, 14px) rotate(-30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes intro-glove-right {
+  0% {
+    transform: translate(105vw, 0) rotate(12deg);
+    opacity: 0;
+  }
+  4% {
+    transform: translate(78vw, 0) rotate(10deg);
+    opacity: 1;
+  }
+  10% {
+    transform: translate(58vw, 0) rotate(8deg);
+    opacity: 1;
+  }
+  18% {
+    transform: translate(40vw, 0) rotate(6deg);
+    opacity: 1;
+  }
+  26% {
+    transform: translate(25vw, 0) rotate(4deg);
+    opacity: 1;
+  }
+  34% {
+    transform: translate(calc(var(--glove-pre) * 1.7), 0) rotate(3deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(calc(var(--glove-pre) * 1.05), 0) rotate(2deg);
+    opacity: 1;
+  }
+  42% {
+    transform: translate(var(--glove-pre), 0) rotate(2deg);
+    opacity: 1;
+  }
+  44% {
+    transform: translate(var(--glove-impact), 0) rotate(-2deg) scale(1.06);
+    opacity: 1;
+  }
+  48% {
+    transform: translate(var(--glove-post), 0) rotate(3deg) scale(1);
+    opacity: 1;
+  }
+  54% {
+    transform: translate(calc(var(--glove-w) * 0.85), 0) rotate(5deg);
+    opacity: 1;
+  }
+  62% {
+    transform: translate(22vw, 2px) rotate(7deg);
+    opacity: 1;
+  }
+  72% {
+    transform: translate(35vw, 4px) rotate(10deg);
+    opacity: 1;
+  }
+  82% {
+    transform: translate(52vw, 6px) rotate(14deg);
+    opacity: 1;
+  }
+  92% {
+    transform: translate(78vw, 10px) rotate(22deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(115vw, 14px) rotate(30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes intro-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    opacity: 0.9;
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay {
+    display: none !important;
+  }
+}
