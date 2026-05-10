@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Banner } from "@/components/Banner";
 import { Hero } from "@/components/Hero";
 import { Benefits } from "@/components/Benefits";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -12,6 +13,7 @@ export default function HomePage() {
     <>
       <Header />
       <main id="main" className="bg-surface">
+        <Banner />
         <Hero />
         <Benefits />
         <HowItWorks />
