@@ -10,6 +10,7 @@ import { SmartImage } from "@/components/ui/SmartImage";
 
 const NAV_LINKS = [
   { href: "#beneficios", label: "Beneficios" },
+  { href: "#sobre-nosotros", label: "Sobre la escuela" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#galeria", label: "Galería" },
   { href: "#reservas", label: "Reservar" },

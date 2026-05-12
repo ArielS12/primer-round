@@ -54,6 +54,35 @@ body {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                          Print (tarjeta con QR)                            */
+/* -------------------------------------------------------------------------- */
+/*
+ * Pensado para la página /tarjeta. Al imprimir queremos:
+ *   - Ocultar la intro animada y cualquier UI que no sea la tarjeta.
+ *   - Centrar la tarjeta en la hoja y eliminar fondos / sombras.
+ *
+ * Las clases utilitarias `print:hidden` (Tailwind) cubren los botones y el
+ * título de la página. Estas reglas globales se ocupan del resto.
+ */
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  .intro-overlay,
+  .intro-skip {
+    display: none !important;
+  }
+
+  /* Evita que un page-break parta la tarjeta a la mitad. */
+  #tarjeta-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /*                          Intro animation (welcome)                         */
 /* -------------------------------------------------------------------------- */
 

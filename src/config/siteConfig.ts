@@ -191,6 +191,24 @@ export const siteConfig = {
     },
   ] as Beneficio[],
 
+  historia: {
+    eyebrow: "Sobre la escuela",
+    titulo: "Mucho más que un gimnasio: un equipo",
+    parrafos: [
+      "Primer Round nació de la pasión por el kickboxing y de la convicción de que en Necochea hacía falta un espacio donde la técnica de competencia conviviera con la calidez de un grupo de barrio.",
+      "Lo que empezó como entrenamientos para un puñado de amigos se transformó en una escuela con alumnos de todas las edades, donde conviven quienes buscan moverse después del trabajo y competidores convocados a la Selección Argentina de Kickboxing.",
+      "Hoy, después de años de torneos, copas, viajes y muchas rondas, seguimos con la misma filosofía: enseñar técnica real, motivar a cada alumno y construir un grupo que empuja a dar lo mejor en cada ronda.",
+    ],
+    hitos: [
+      { valor: "+10", etiqueta: "Años formando atletas" },
+      { valor: "+200", etiqueta: "Alumnos pasaron por la escuela" },
+      { valor: "Selección", etiqueta: "Atletas convocados al Panamericano" },
+      { valor: "Todos", etiqueta: "Los niveles y edades, bienvenidos" },
+    ],
+    /** Imagen destacada (cualquier `/uploads/*.jpg`). */
+    imagen: "/uploads/gallery-12.jpg",
+  },
+
   comoFunciona: [
     {
       paso: 1,
